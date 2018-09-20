@@ -1,0 +1,105 @@
+---
+
+### Connection parameters
+bigiq_onboard_server: localhost
+bigiq_onboard_server_port: 443
+bigiq_onboard_user: admin
+bigiq_onboard_password: secret
+bigiq_onboard_validate_certs: no
+bigiq_onboard_transport: rest
+bigiq_onboard_timeout: 120
+
+### Username/password setting configuration
+bigiq_onboard_new_root_password:
+bigiq_onboard_old_root_password: default
+bigiq_onboard_new_admin_password:
+bigiq_onboard_old_admin_password: admin
+
+### Device configuration
+
+# The type of BIG-IQ node to setup.
+#
+# Valid values are,
+#
+#  * cm
+#  * dcd
+#
+bigiq_onboard_node_type: cm
+
+# The master passphrase to set on the device
+#
+# This passphrase is used as a seed to encrypt data that
+# is stored in BIG-IQ. It must meet certain complexity
+# requirements before BIG-IQ will accept it.
+#
+# These are,
+#
+#  * 16 characters long
+#
+# and must contain at least
+#
+#  * one uppercase
+#  * one letter
+#  * one lower case letter
+#  * one number
+#  * special character
+#
+bigiq_onboard_master_passphrase:
+
+### DNS configuration
+
+# DNS servers that the BIG-IQ will use for name resolution
+#
+# This value **must** be a list. By default, the nameserver
+# provided is one run by Google. This will work, however,
+# you will be unable to resolve DNS names internal to your
+# organization.
+#
+# You should change this to the Primary/Secondary nameservers
+# of your organization.
+#
+bigiq_onboard_dns_nameservers:
+  - 8.8.8.8
+
+# DNS search domains
+#
+# The domains that hostnames will be searched within by default.
+#
+# This should be changed to include the name of your organizations
+# domain.
+#
+bigiq_onboard_dns_search:
+  - localhost
+
+### NTP configuration
+
+# NTP servers to configure on the BIG-IQ
+#
+# This value **must** be a list of items (even if there is
+# only one item).
+#
+# The default value is typically sufficient for most deployments
+# unless you have a specific need in your environment (for
+# instance if your stratum 1 time server is a site router or
+# something.
+#
+bigiq_onboard_ntp_servers:
+  - time.nist.gov
+
+# The timezone to set on the BIG-IQ device
+#
+# This timezone should be specified in the "TZ" format as seen
+# here
+#
+#  * https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+#
+bigiq_onboard_timezone: America/Los_Angeles
+
+### License configuration
+#
+# License key to use to license the BIG-IQ device.
+#
+# If you do not wish to license your device, leave this
+# field empty.
+#
+bigiq_onboard_license_key:

@@ -1,0 +1,24 @@
+---
+
+- name: Check if master passphrase is set
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/cm/shared/secure-storage/masterkey"
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    user: "{{ bigiq_onboard_user }}"
+    password: "{{ bigiq_onboard_password }}"
+  register: mk
+
+- name: Set master passphrase
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/cm/shared/secure-storage/masterkey"
+    method: POST
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    user: "{{ bigiq_onboard_user }}"
+    password: "{{ bigiq_onboard_password }}"
+    body:
+      passphrase: "{{ bigiq_onboard_master_passphrase }}"
+    body_format: json
+  register: result
+  when: mk.json.isMkSet is not defined

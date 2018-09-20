@@ -1,0 +1,34 @@
+---
+
+- name: Get management address details
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/system/easy-setup"
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    user: "{{ bigiq_onboard_user }}"
+    password: "{{ bigiq_onboard_password }}"
+  register: ez
+
+- name: Set discovery address
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/identified-devices/config/discovery"
+    method: PUT
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    user: "{{ bigiq_onboard_user }}"
+    password: "{{ bigiq_onboard_password }}"
+    body:
+      discoveryAddress: "{{ ez.json.managementIpAddress[:-3] }}"
+    body_format: json
+
+- name: Check discovery address is correct
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/identified-devices/config/discovery"
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    user: "{{ bigiq_onboard_user }}"
+    password: "{{ bigiq_onboard_password }}"
+  register: result
+  until: ez.json.managementIpAddress[:-3] == result.json.discoveryAddress
+  retries: 5
+  delay: 3

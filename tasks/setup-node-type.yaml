@@ -1,0 +1,19 @@
+---
+
+- name: Check that node type value is valid
+  fail:
+    msg: "bigiq_onboard_node_type value must be either 'cm' or 'dcd'"
+  when: bigiq_onboard_node_type not in ['cm', 'dcd']
+
+- name: Request to license device
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/cm/system/provisioning"
+    method: POST
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    user: "{{ bigiq_onboard_user }}"
+    password: "{{ bigiq_onboard_password }}"
+    body:
+      systemPersonality: logging_node
+    body_format: json
+  when: bigiq_onboard_node_type == 'dcd'
