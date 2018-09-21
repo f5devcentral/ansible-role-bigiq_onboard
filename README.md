@@ -79,7 +79,7 @@ None.
       vars_files:
         - vars/main.yml
       roles:
-        - { role: F5Networks.bigiq-onboard }
+        - { role: f5devcentral.bigiq_onboard }
 
 *Inside `vars/main.yml`*:
 
