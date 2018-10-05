@@ -1,6 +1,6 @@
 # Ansible Role: BIG-IQ Onboard
 
-Performs a basic series of onboarding steps to bootstrap a BIG-IQ system
+Performs a basic series of on-boarding steps to bootstrap a BIG-IQ system
 to the point that it can accept configuration.
 
 ## Requirements
@@ -99,7 +99,7 @@ None.
 
 ## License
 
-Apache2
+Apache
 
 ## Author Information
 
