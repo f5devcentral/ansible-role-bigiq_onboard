@@ -3,9 +3,5 @@
 - hosts: all
   connection: local
 
-  vars:
-    bigiq_onboard_password: admin
-    bigiq_onboard_server: 10.192.75.185
-
   roles:
     - bigiq-onboard
