@@ -110,3 +110,8 @@ Apache
 ## Author Information
 
 This role was created in 2018 by [Tim Rupp](https://github.com/caphrim007).
+
+## Credits
+
+A special thanks to Jeff Geerling ([@geerlingguy](https://github.com/geerlingguy)) for the
+molecule test examples.

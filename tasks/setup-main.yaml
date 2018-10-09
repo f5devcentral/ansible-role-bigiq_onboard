@@ -4,17 +4,11 @@
   when: bigiq_onboard_license_key|default(False)
 
 - include_tasks: setup-node-type.yaml
-
 - include_tasks: setup-management-address.yaml
-
 - include_tasks: setup-services.yaml
-
 - include_tasks: setup-master-passphrase.yaml
-
-- include_tasks: setup-passwords.yaml
-
 - include_tasks: setup-hostname.yaml
-
+- include_tasks: setup-passwords.yaml
 - include_tasks: setup-mark-system-setup.yaml
 
 - name: Reboot device
@@ -23,10 +17,9 @@
     method: PATCH
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
-    user: "{{ bigiq_onboard_user }}"
-    password: "{{ bigiq_onboard_credentials_password }}"
+    HEADER_X-F5-Auth-Token: "{{ f5_auth_token }}"
     body:
-      restart: True
+      restart: true
     body_format: json
 
 - name: Wait for device to go offline

@@ -5,8 +5,7 @@
     url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/system/easy-setup"
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
-    user: "{{ bigiq_onboard_user }}"
-    password: "{{ bigiq_onboard_password }}"
+    HEADER_X-F5-Auth-Token: "{{ f5_auth_token }}"
   register: ez
 
 - name: Set discovery address
@@ -15,8 +14,7 @@
     method: PUT
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
-    user: "{{ bigiq_onboard_user }}"
-    password: "{{ bigiq_onboard_password }}"
+    HEADER_X-F5-Auth-Token: "{{ f5_auth_token }}"
     body:
       discoveryAddress: "{{ ez.json.managementIpAddress[:-3] }}"
     body_format: json
@@ -26,8 +24,7 @@
     url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/identified-devices/config/discovery"
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
-    user: "{{ bigiq_onboard_user }}"
-    password: "{{ bigiq_onboard_password }}"
+    HEADER_X-F5-Auth-Token: "{{ f5_auth_token }}"
   register: result
   until: ez.json.managementIpAddress[:-3] == result.json.discoveryAddress
   retries: 5

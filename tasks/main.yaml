@@ -20,13 +20,29 @@
   retries: 10
   delay: 6
 
+- name: Get authentication token
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/authn/login"
+    method: POST
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    body:
+      username: "{{ bigiq_onboard_user }}"
+      password: "{{ bigiq_onboard_password }}"
+    body_format: json
+  register: r
+
+- name: Set the token fact if authentication succeeded
+  set_fact:
+    f5_auth_token: "{{ r.json.token.token }}"
+  when: r is success
+
 - name: Test authentication
   uri:
     url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/echo"
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
-    user: "{{ bigiq_onboard_user }}"
-    password: "{{ bigiq_onboard_password }}"
+    HEADER_X-F5-Auth-Token: "{{ f5_auth_token }}"
   register: status
 
 - name: Check if system is setup
@@ -34,8 +50,7 @@
     url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/system/setup"
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
-    user: "{{ bigiq_onboard_user }}"
-    password: "{{ bigiq_onboard_password }}"
+    HEADER_X-F5-Auth-Token: "{{ f5_auth_token }}"
   register: setup
 
 - include_tasks: setup-main.yaml
