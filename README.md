@@ -68,6 +68,12 @@ The timezone to set on the BIG-IQ device. This timezone should be specified in t
 License key to use to license the BIG-IQ device. If you do not wish to license your
 device, leave this field empty.
 
+    bigiq_onboard_hostname:
+
+Specifies the hostname of the BIG-IQ device. By default, this setting is commented out.
+This means that the BIG-IQ will default to a generic hostname. By specifying this value
+to the role, you can override this default generic
+
 ## Dependencies
 
 None.
