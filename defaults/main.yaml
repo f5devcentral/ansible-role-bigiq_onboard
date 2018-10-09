@@ -103,3 +103,14 @@ bigiq_onboard_timezone: America/Los_Angeles
 # field empty.
 #
 bigiq_onboard_license_key:
+
+### Hostname of the BIG-IQ
+#
+# Specifies the hostname that the BIG-IQ should have.
+#
+# By default, we do not specify this and let the system default
+# to the hostname that is set when the device is first created.
+#
+# Uncomment the value below to specify a hostname
+#
+#bigiq_onboard_hostname: bigiq01.domain.com

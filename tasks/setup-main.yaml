@@ -13,6 +13,8 @@
 
 - include_tasks: setup-passwords.yaml
 
+- include_tasks: setup-hostname.yaml
+
 - include_tasks: setup-mark-system-setup.yaml
 
 - name: Reboot device
