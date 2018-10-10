@@ -8,6 +8,7 @@
     headers:
       X-F5-Auth-Token: "{{ f5_auth_token }}"
   register: ez
+  when: bigiq_onboard_discovery_address is not defined
 
 - name: Set discovery address
   uri:
@@ -20,6 +21,7 @@
     body:
       discoveryAddress: "{{ ez.json.managementIpAddress[:-3] }}"
     body_format: json
+  when: bigiq_onboard_discovery_address is not defined
 
 - name: Check discovery address is correct
   uri:
@@ -32,3 +34,20 @@
   until: ez.json.managementIpAddress[:-3] == result.json.discoveryAddress
   retries: 5
   delay: 3
+  when: bigiq_onboard_discovery_address is not defined
+
+- name: Set discovery address to self-ip
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/system/easy-setup"
+    method: PATCH
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
+    body:
+      selfIpAddresses:
+        - address: "{{ bigiq_onboard_discovery_address }}"
+          vlan: internal
+          iface: 1.1
+    body_format: json
+  when: bigiq_onboard_discovery_address is defined

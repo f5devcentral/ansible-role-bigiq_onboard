@@ -44,7 +44,7 @@ bigiq_onboard_node_type: cm
 #  * one number
 #  * special character
 #
-bigiq_onboard_master_passphrase:
+# bigiq_onboard_master_passphrase: Change!Me!Now!1234
 
 ### DNS configuration
 
@@ -111,7 +111,7 @@ bigiq_onboard_license_key:
 # By default, we do not specify this and let the system default
 # to the hostname that is set when the device is first created.
 #
-# bigiq_onboard_hostname:
+# bigiq_onboard_hostname: foo.bar.com
 
 ### Force re-running the role
 #
@@ -122,4 +122,18 @@ bigiq_onboard_license_key:
 # Therefore, the BIG-IQ will say it is configured even after you
 # essentially restored system defaults.
 #
-bigiq_onboard_force: false
+# bigiq_onboard_force: false
+
+### Discovery address Self-IP to set
+#
+# Use this to specify a self-ip to use as the discovery address.
+# If this value is commented out (the default) it will use the
+# BIG-IQ's management address as the discovery address.
+#
+# You **must** include the subnet with the IP address as well.
+# The subnet should be in CIDR format. ex, 1.2.3.4/32
+#
+# A VLAN named 'internal' will be created along with the self-ip
+# automatically.
+#
+# bigiq_onboard_discovery_address: 1.2.3.4/32

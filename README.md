@@ -9,7 +9,7 @@ None.
 
 ## Role Variables
 
-Available variables are listed below, along with default values (see `defaults/main.yml`):
+Available variables are listed below. For their default values, see `defaults/main.yml`:
 
     bigiq_onboard_server: localhost
     bigiq_onboard_server_port: 443
@@ -68,11 +68,19 @@ The timezone to set on the BIG-IQ device. This timezone should be specified in t
 License key to use to license the BIG-IQ device. If you do not wish to license your
 device, leave this field empty.
 
-    bigiq_onboard_hostname:
+    bigiq_onboard_hostname: foo.bar.com
 
 Specifies the hostname of the BIG-IQ device. By default, this setting is commented out.
 This means that the BIG-IQ will default to a generic hostname. By specifying this value
 to the role, you can override this default generic
+
+    bigiq_onboard_discovery_address: 1.2.3.4/32
+
+Specifies a custom discovery address to create. The address will be created as a Self IP
+and then the Self IP will be assigned as the discovery address. Specifying an address
+will also enforce the creation of a default VLAN named 'internal'.
+
+This IP Address **must** include the subnet in CIDR form, as shown in the example above.
 
 ## Dependencies
 
