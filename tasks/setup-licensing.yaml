@@ -11,7 +11,8 @@
     method: POST
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
-    HEADER_X-F5-Auth-Token: "{{ f5_auth_token }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
     body:
       baseRegKey: "{{ bigiq_onboard_license_key }}"
       addOnKeys: []
@@ -23,7 +24,8 @@
     url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/tm/shared/licensing/activation"
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
-    HEADER_X-F5-Auth-Token: "{{ f5_auth_token }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
   register: status
   until: status.json.status in ['LICENSING_COMPLETE', 'LICENSING_FAILED', 'NEED_EULA_ACCEPT']
 
@@ -38,7 +40,8 @@
     method: POST
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
-    HEADER_X-F5-Auth-Token: "{{ f5_auth_token }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
     body:
       baseRegKey: "{{ bigiq_onboard_license_key }}"
       addOnKeys: []
@@ -51,7 +54,8 @@
     url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/tm/shared/licensing/activation"
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
-    HEADER_X-F5-Auth-Token: "{{ f5_auth_token }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
   register: status
   until: status.json.status in ['LICENSING_COMPLETE', 'LICENSING_FAILED']
 
@@ -71,7 +75,8 @@
     method: PUT
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
-    HEADER_X-F5-Auth-Token: "{{ f5_auth_token }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
     body:
       licenseText: "{{ status.json.licenseText }}"
     body_format: json

@@ -6,7 +6,8 @@
     method: PATCH
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
-    HEADER_X-F5-Auth-Token: "{{ f5_auth_token }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
     body:
       isSystemSetup: true
     body_format: json

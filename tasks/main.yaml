@@ -42,7 +42,8 @@
     url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/echo"
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
-    HEADER_X-F5-Auth-Token: "{{ f5_auth_token }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
   register: status
 
 - name: Check if system is setup
@@ -50,8 +51,9 @@
     url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/system/setup"
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
-    HEADER_X-F5-Auth-Token: "{{ f5_auth_token }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
   register: setup
 
 - include_tasks: setup-main.yaml
-  when: setup.json.isSystemSetup is not defined
+  when: setup.json.isSystemSetup is not defined or bigiq_onboard_force|bool
