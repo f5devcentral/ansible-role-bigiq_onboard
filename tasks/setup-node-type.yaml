@@ -5,7 +5,7 @@
     msg: "bigiq_onboard_node_type value must be either 'cm' or 'dcd'"
   when: bigiq_onboard_node_type not in ['cm', 'dcd']
 
-- name: Request to license device
+- name: Provision type on device
   uri:
     url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/cm/system/provisioning"
     method: POST
