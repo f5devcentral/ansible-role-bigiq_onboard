@@ -27,3 +27,4 @@
     body_format: json
   register: result
   when: mk.json.isMkSet is not defined or not mk.json.isMkSet|bool
+  notify: Restart device
