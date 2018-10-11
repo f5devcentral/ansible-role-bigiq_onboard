@@ -23,7 +23,7 @@ provisioner:
   inventory:
     host_vars:
       instance:
-        bigiq_onboard_server: localhost
+        bigiq_onboard_server: ${F5_ANSIBLE_HOST:-localhost}
         bigiq_onboard_user: admin
         bigiq_onboard_password: secret
   env:
