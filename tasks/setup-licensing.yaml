@@ -46,7 +46,8 @@
       baseRegKey: "{{ bigiq_onboard_license_key }}"
       addOnKeys: []
       activationMethod: AUTOMATIC
-      eulaText: status.json.eulaText
+      eulaText: "{{ status.json.eulaText }}"
+    body_format: json
   when: status.json.status == 'NEED_EULA_ACCEPT'
 
 - name: Request license status, with EULA
