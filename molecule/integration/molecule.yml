@@ -29,6 +29,7 @@ provisioner:
         bigiq_onboard_license_key: ${BIGIQ_ONBOARD_LICENSE_KEY}
         bigiq_onboard_master_passphrase: ${BIGIQ_ONBOARD_MASTER_PASSPHRASE:-Change!Me!Now!1234}
         bigiq_onboard_node_type: ${BIGIQ_ONBOARD_NODE_TYPE:-cm}
+        bigiq_onboard_force: ${BIGIQ_ONBOARD_FORCE:-false}
   env:
     ANSIBLE_ROLES_PATH: ../../../
   lint:
