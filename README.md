@@ -82,6 +82,12 @@ will also enforce the creation of a default VLAN named 'internal'.
 
 This IP Address **must** include the subnet in CIDR form, as shown in the example above.
 
+    bigiq_onboard_set_basic_auth: false
+
+Allows you to enable basic authentication on the BIG-IQ. This is nearly always a "Bad Idea"
+and so by default, it is disabled. The cases where you would want to use this mainly come
+down to debugging and testing.
+
 ## Dependencies
 
 None.

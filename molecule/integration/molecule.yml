@@ -30,6 +30,7 @@ provisioner:
         bigiq_onboard_master_passphrase: ${BIGIQ_ONBOARD_MASTER_PASSPHRASE:-Change!Me!Now!1234}
         bigiq_onboard_node_type: ${BIGIQ_ONBOARD_NODE_TYPE:-cm}
         bigiq_onboard_force: ${BIGIQ_ONBOARD_FORCE:-false}
+        bigiq_onboard_set_basic_auth: ${BIGIQ_ONBOARD_SET_BASIC_AUTH:-false}
   env:
     ANSIBLE_ROLES_PATH: ../../../
   lint:
