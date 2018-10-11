@@ -122,7 +122,7 @@ bigiq_onboard_license_key:
 # Therefore, the BIG-IQ will say it is configured even after you
 # essentially restored system defaults.
 #
-# bigiq_onboard_force: false
+bigiq_onboard_force: false
 
 ### Discovery address Self-IP to set
 #
