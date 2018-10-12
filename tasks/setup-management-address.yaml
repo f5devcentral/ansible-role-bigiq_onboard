@@ -48,6 +48,6 @@
       selfIpAddresses:
         - address: "{{ bigiq_onboard_discovery_address }}"
           vlan: internal
-          iface: 1.1
+          iface: "1.1"
     body_format: json
   when: bigiq_onboard_discovery_address is defined
