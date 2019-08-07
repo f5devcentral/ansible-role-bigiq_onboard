@@ -11,4 +11,4 @@
     body:
       hostname: "{{ bigiq_onboard_hostname }}"
     body_format: json
-  when: bigiq_onboard_hostname|default('') != ''
+  when: bigiq_onboard_hostname|default('') | length > 0

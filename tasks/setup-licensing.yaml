@@ -3,7 +3,7 @@
 - name: Verify license is provided
   fail:
     msg: "You must provide a license via bigiq_onboard_license_key"
-  when: "bigiq_onboard_license_key == ''"
+  when: bigiq_onboard_license_key | length > 0
 
 - name: Request to license device
   uri:
@@ -70,7 +70,7 @@
 - name: Stop if license text was not generated
   fail:
     msg: Failed to generate license text
-  when: status.json.licenseText == ''
+  when: status.json.licenseText | length > 0
 
 - name: Put license on device
   uri:

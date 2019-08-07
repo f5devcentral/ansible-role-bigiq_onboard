@@ -39,7 +39,7 @@
 ############ from here when Discovery IP is defined
 
 - include_tasks: setup-network.yaml
-  when: bigiq_onboard_discovery_address != provider.server 
+  when: bigiq_onboard_discovery_address != provider.server
 
 - name: Set discovery address to self-ip
   uri:
@@ -55,10 +55,4 @@
           vlan: discovery
           iface: "1.1"
     body_format: json
-  when: bigiq_onboard_discovery_address != provider.server 
-
-
-
-
-
-
+  when: bigiq_onboard_discovery_address != provider.server
