@@ -1,10 +1,10 @@
 ---
 
 ### Connection parameters
-bigiq_onboard_server: localhost
+bigiq_onboard_server: "{{ ansible_host }}"
 bigiq_onboard_server_port: 443
 bigiq_onboard_user: admin
-bigiq_onboard_password: secret
+bigiq_onboard_password: admin
 bigiq_onboard_validate_certs: false
 bigiq_onboard_transport: rest
 bigiq_onboard_timeout: 120
@@ -13,7 +13,7 @@ bigiq_onboard_timeout: 120
 bigiq_onboard_new_root_password:
 bigiq_onboard_old_root_password: default
 bigiq_onboard_new_admin_password:
-bigiq_onboard_old_admin_password: admin
+bigiq_onboard_old_admin_password: "{{ bigiq_onboard_password }}"
 
 ### Device configuration
 
@@ -44,7 +44,7 @@ bigiq_onboard_node_type: cm
 #  * one number
 #  * special character
 #
-# bigiq_onboard_master_passphrase: Change!Me!Now!1234
+#bigiq_onboard_master_passphrase: "ThisIsMySuperSecretMasterKey123!"
 
 ### DNS configuration
 #
@@ -111,7 +111,7 @@ bigiq_onboard_license_key:
 # By default, we do not specify this and let the system default
 # to the hostname that is set when the device is first created.
 #
-# bigiq_onboard_hostname: foo.bar.com
+bigiq_onboard_hostname: "{{ inventory_hostname }}"
 
 ### Force re-running the role
 #
@@ -133,10 +133,11 @@ bigiq_onboard_force: false
 # You **must** include the subnet with the IP address as well.
 # The subnet should be in CIDR format. ex, 1.2.3.4/32
 #
-# A VLAN named 'internal' will be created along with the self-ip
+# A VLAN named 'discovery' will be created along with the self-ip
 # automatically.
 #
-# bigiq_onboard_discovery_address: 1.2.3.4/32
+#bigiq_onboard_discovery_address: 1.2.3.4/32
+bigiq_onboard_discovery_address: "{{ discoveryip | default(ansible_host) }}"
 
 ## Enable basic auth
 #

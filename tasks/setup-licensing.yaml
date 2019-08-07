@@ -28,7 +28,7 @@
       X-F5-Auth-Token: "{{ f5_auth_token }}"
   register: status
   until: status.json.status in ['LICENSING_COMPLETE', 'LICENSING_FAILED', 'NEED_EULA_ACCEPT']
-  retries: 5
+  retries: 10
 
 - name: Stop if licensing failed
   fail:

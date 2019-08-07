@@ -30,12 +30,12 @@
       username: "{{ bigiq_onboard_user }}"
       password: "{{ bigiq_onboard_password }}"
     body_format: json
-  register: r
+  register: authtokenonb
 
 - name: Set the token fact if authentication succeeded
   set_fact:
-    f5_auth_token: "{{ r.json.token.token }}"
-  when: r is success
+    f5_auth_token: "{{ authtokenonb.json.token.token }}"
+  when: authtokenonb is success
 
 - name: Test authentication
   uri:
@@ -55,5 +55,6 @@
       X-F5-Auth-Token: "{{ f5_auth_token }}"
   register: setup
 
-- include_tasks: setup-main.yaml
-  when: setup.json.isSystemSetup is not defined or bigiq_onboard_force|bool
+- name: include setup-main.yaml
+  include_tasks: setup-main.yaml
+  #when: setup.json.isSystemSetup is not defined or bigiq_onboard_force|bool
