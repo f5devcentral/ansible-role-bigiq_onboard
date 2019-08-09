@@ -57,4 +57,4 @@
 
 - name: include setup-main.yaml
   include_tasks: setup-main.yaml
-  #when: setup.json.isSystemSetup is not defined or bigiq_onboard_force|bool
+  # when: setup.json.isSystemSetup is not defined or bigiq_onboard_force|bool
