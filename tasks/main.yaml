@@ -1,5 +1,11 @@
 ---
 
+- name: collect secondary bigiq ip address
+  set_fact:
+    secondary_bigiq_address: "{{ hostvars[item].ansible_host }}"
+  with_items: "{{ groups['all'] }}"
+  when: not {{ hostvars[item].haprimary | default(True)|bool }}
+
 - name: Setup provider
   set_fact:
     provider:
