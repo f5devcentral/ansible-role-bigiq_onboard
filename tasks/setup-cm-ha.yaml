@@ -1,0 +1,62 @@
+---
+
+- name: Check if ha has been configured
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/failover-state"
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
+  register: ha
+  when:
+    - hostvars[inventory_hostname]['haprimary']
+
+- name: Grab fingerprint from secondary BIGIQ
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/ssh-trust-setup?ipAddress={{ secondary_bigiq_address }}"
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
+  register: fingerprint
+  when:
+    - hostvars[inventory_hostname]['haprimary']
+    - ha.json.systemMode == 'STANDALONE'
+
+- name: Add secondary BIGIQ as peer
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/ha/add-peer-task"
+    method: POST
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
+    body:
+      fingerprint: "{{ fingerprint.json.fingerprint }}"
+      rootPassword: "{{ bigiq_onboard_new_root_password }}"
+      ipAddress: "{{ secondary_bigiq_address }}"
+      userName: "{{ bigiq_onboard_user }}"
+      password: "{{ bigiq_onboard_new_admin_password }}"
+    body_format: json
+    status_code: 202
+  register: add_peer
+  when:
+    - hostvars[inventory_hostname]['haprimary']
+    - ha.json.systemMode == 'STANDALONE'
+
+- name: Verify peer added successfully
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/ha/add-peer-task/{{ add_peer.json.id }}"
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
+  register: status
+  until: status.json.status in ['FINISHED', 'FAILED']
+  retries: 40
+  delay: 10
+  when:
+    - hostvars[inventory_hostname]['haprimary']
+    - ha.json.systemMode == 'STANDALONE'
+  failed_when: "'FAILED' in status.json.status"
+  changed_when: "'FINISHED' in status.json.status"

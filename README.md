@@ -7,6 +7,17 @@ to the point that it can accept configuration.
 
 None.
 
+## Host Variables
+
+Host varibales are listed below:
+
+    haprimary=True
+    haprimary=False
+
+Add variable to host when using role to configure BIG-IQ CM. If configuring 2 hosts and want 
+to establish HA pair, add haprimary=True to primary BIG-IQ host and haprimary=False
+to Secondary BIG-IP host.
+
 ## Role Variables
 
 Available variables are listed below. For their default values, see `defaults/main.yml`:
@@ -123,7 +134,8 @@ Apache
 
 ## Author Information
 
-This role was created in 2018 by [Tim Rupp](https://github.com/caphrim007).
+This role was created in 2018 by [Tim Rupp](https://github.com/caphrim007).<br>
+This role was modified in 2019 by [Greg Crosby](https://github.com/crosbygw).<br>
 
 ## Credits
 
