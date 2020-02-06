@@ -18,22 +18,7 @@
       addOnKeys: []
       activationMethod: AUTOMATIC
     body_format: json
-  when: status.json.build is undefined or status.json.build is not match("^\D+.[7-].[1-].[0-]$")
 
-
-- name: Request to license device (BIGIQ >= 7.1)
-  uri:
-    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/license/activate"
-    method: POST
-    timeout: "{{ bigiq_onboard_timeout }}"
-    validate_certs: "{{ bigiq_onboard_validate_certs }}"
-    headers:
-      X-F5-Auth-Token: "{{ f5_auth_token }}"
-    body:
-      baseRegKey: "{{ bigiq_onboard_license_key }}"
-      addOnKeys: []
-    body_format: json
-  when: status.json.build is defined and status.json.build is match("^\D+.[7-].[1-].[0-]$")
 
 - name: Request license status (BIGIQ < 7.1)
   uri:
@@ -45,20 +30,7 @@
   register: status
   until: status.json.status in ['LICENSING_COMPLETE', 'LICENSING_FAILED', 'NEED_EULA_ACCEPT']
   retries: 10
-  when: status.json.build is undefined or status.json.build is not match("^\D+.[7-].[1-].[0-]$")
 
-
-- name: Request license status  (BIGIQ >= 7.1)
-  uri:
-    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/license/activate"
-    timeout: "{{ bigiq_onboard_timeout }}"
-    validate_certs: "{{ bigiq_onboard_validate_certs }}"
-    headers:
-      X-F5-Auth-Token: "{{ f5_auth_token }}"
-  register: status
-  until: status.json.status in ['LICENSING_COMPLETE', 'LICENSING_FAILED', 'NEED_EULA_ACCEPT']
-  retries: 10
-  when: status.json.build is defined and status.json.build is match("^\D+.[7-].[1-].[0-]$")
 
 - name: Stop if licensing failed
   fail:
@@ -79,22 +51,8 @@
       activationMethod: AUTOMATIC
       eulaText: "{{ status.json.eulaText }}"
     body_format: json
-  when: status.json.status == 'NEED_EULA_ACCEPT' and (status.json.build is undefined or status.json.build is not match("^\D+.[7-].[1-].[0-]$") )
+  when: status.json.status == 'NEED_EULA_ACCEPT'
 
-- name: Send EULA if requested (BIGIQ >= 7.1)
-  uri:
-    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/license/accept-eula"
-    method: POST
-    timeout: "{{ bigiq_onboard_timeout }}"
-    validate_certs: "{{ bigiq_onboard_validate_certs }}"
-    headers:
-      X-F5-Auth-Token: "{{ f5_auth_token }}"
-    body:
-      baseRegKey: "{{ bigiq_onboard_license_key }}"
-      dossier: "{{ status.json.dossier }}"
-      eulaText: "{{ status.json.eulaText }}"
-    body_format: json
-  when: status.json.status == 'NEED_EULA_ACCEPT' and (status.json.build is defined and status.json.build is match("^\D+.[7-].[1-].[0-]$"))
 
 - name: Request license status, with EULA (BIGIQ < 7.1)
   uri:
@@ -106,19 +64,6 @@
   register: status
   until: status.json.status in ['LICENSING_COMPLETE', 'LICENSING_FAILED']
   retries: 5
-  when: status.json.build is undefined or status.json.build is not match("^\D+.[7-].[1-].[0-]$")
-
-- name: Request license status, with EULA (BIGIQ < 7.1)
-  uri:
-    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/tm/shared/licensing/activation"
-    timeout: "{{ bigiq_onboard_timeout }}"
-    validate_certs: "{{ bigiq_onboard_validate_certs }}"
-    headers:
-      X-F5-Auth-Token: "{{ f5_auth_token }}"
-  register: status
-  until: status.json.status in ['LICENSING_COMPLETE', 'LICENSING_FAILED']
-  retries: 5
-  when: status.json.build is undefined or status.json.build is not match("^\D+.[7-].[1-].[0-]$")
 
 - name: Stop if EULA sending failed
   fail:
@@ -141,4 +86,3 @@
     body:
       licenseText: "{{ status.json.licenseText }}"
     body_format: json
-  when: status.json.build is undefined or status.json.build is not match("^\D+.[7-].[1-].[0-]$")

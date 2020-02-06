@@ -1,0 +1,76 @@
+---
+
+- name: Get new authentication token since BIGIQ launch takes a while
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/authn/login"
+    method: POST
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    body:
+      username: "{{ bigiq_onboard_user }}"
+      password: "{{ bigiq_onboard_password }}"
+    body_format: json
+  register: r
+
+- name: Launch BIGIQ >= 7.1
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/launch"
+    method: POST
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
+    body_format: json
+  register: launch_status
+
+- name: Set the token fact if authentication succeeded
+  set_fact:
+    f5_auth_token: "{{ r.json.token.token }}"
+  when: r is success
+
+- name: Monitor BIGIQ Launch
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/launch/monitor?datetime={{ launch_status.json.fileTimestamp }}"
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
+  register: launch_monitor
+  until: launch_monitor.json.status in ['COMPLETE', 'ERROR']
+  retries: 20
+  delay: 60
+  when: >
+    launch_status.json.fileTimestamp is defined
+  ignore_errors: true
+
+# New BIGIQ 7.1 Onboard API restarts the device which causes connectivity problem
+# As workaround, we trigger another monitor check after BIGIQ devices become available
+- name: Validate if BIGIQ launch monitoring failed due to system restart
+  set_fact:
+    is_system_restarted: true
+  when: launch_monitor.json.status is undefined
+
+- name: BIGIQ System restart causes connectivity problems. Sleeping for 2 minutes and continue...
+  wait_for:
+    timeout: 120
+
+- name: Wait for BIG-IQ to be available
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/info/system"
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+  register: system_status
+  until: >
+    system_status is success and
+    system_status.json.available|bool
+  retries: 30
+  delay: 30
+
+- name: Validate BIGIQ launch state.
+  fail:
+    msg: BIGIQ Lauch failed
+  when: >
+    launch_monitor.json is defined and
+    launch_monitor.json.status is defined and
+    launch_monitor.json.status == 'ERROR' and
+    is_system_restarted is undefined

@@ -6,6 +6,16 @@
   with_items: "{{ groups['all'] }}"
   when: not {{ hostvars[item].haprimary | default(True)|bool }}
 
+- name: Wait for BIG-IQ to be available
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/info/system"
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+  register: system_status
+  until: system_status is success and system_status.json.available|bool
+  retries: 15
+  delay: 15
+
 - name: Setup provider
   set_fact:
     provider:
@@ -15,16 +25,6 @@
       password: "{{ bigiq_onboard_password }}"
       validate_certs: "{{ bigiq_onboard_validate_certs }}"
       transport: "{{ bigiq_onboard_transport }}"
-
-- name: Wait for BIG-IQ to be available
-  uri:
-    url: "https://{{ provider.server }}:{{ provider.server_port }}/info/system"
-    timeout: "{{ bigiq_onboard_timeout }}"
-    validate_certs: "{{ bigiq_onboard_validate_certs }}"
-  register: status
-  until: status is success and status.json.available|bool
-  retries: 10
-  delay: 6
 
 - name: Get authentication token
   uri:
@@ -43,6 +43,18 @@
     f5_auth_token: "{{ authtokenonb.json.token.token }}"
   when: authtokenonb is success
 
+- name: Get BIGIQ System Info
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/info/system"
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
+  register: system_status
+  until: system_status is success and system_status.json.available|bool
+  retries: 10
+  delay: 6
+
 - name: Test authentication (BIGIQ < 7.1)
   uri:
     url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/echo"
@@ -50,7 +62,7 @@
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
     headers:
       X-F5-Auth-Token: "{{ f5_auth_token }}"
-  when: status.json.build is undefined or status.json.build is not match("^\D+.[7-].[1-].[0-]$")
+  when: system_status.json.build is undefined or system_status.json.build is not match("^\D+.[7-].[1-].[0-].*$")
 
 - name: Test authentication (BIGIQ >= 7.1)
   uri:
@@ -59,7 +71,10 @@
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
     headers:
       X-F5-Auth-Token: "{{ f5_auth_token }}"
-  when: status.json.build is defined and status.json.build is match("^\D+.[7-].[1-].[0-]$")
+  when: >
+    system_status.json.build is defined and
+    system_status.json.build is match("^\D+.[7-].[1-].[0-].*$") and
+    not system_status.json.isSystemSetup|bool
 
 
 - name: Check if system is setup (BIGIQ < 7.1)
@@ -70,9 +85,7 @@
     headers:
       X-F5-Auth-Token: "{{ f5_auth_token }}"
   register: setup
-  when: status.json.build is undefined or status.json.build is not match("^\D+.[7-].[1-].[0-]$")
-
-
+  when: system_status.json.build is undefined or system_status.json.build is not match("^\D+.[7-].[1-].[0-].*$")
 
 - name: Check if system is setup (BIGIQ >= 7.1)
   uri:
@@ -82,9 +95,19 @@
     headers:
       X-F5-Auth-Token: "{{ f5_auth_token }}"
   register: setup
-  when: status.json.build is defined and status.json.build is match("^\D+.[7-].[1-].[0-]$")
+  when: >
+    system_status.json.build is defined and
+    system_status.json.build is match("^\D+.[7-].[1-].[0-].*$") and
+    not system_status.json.isSystemSetup|bool
 
-
-- name: include setup-main.yaml
+- name: include setup-main.yaml (BIGIQ < 7.1)
   include_tasks: setup-main.yaml
-  # when: setup.json.isSystemSetup is not defined or bigiq_onboard_force|bool
+  when: >
+    system_status.json.build is undefined or
+    system_status.json.build is not match("^\D+.[7-].[1-].[0-].*$")
+
+- name: include setup-main-bigiq7_1.yaml (BIGIQ >= 7.1)
+  include_tasks: setup-main-bigiq7_1.yaml
+  when: >
+    system_status.json.build is defined and
+    system_status.json.build is match("^\D+.[7-].[1-].[0-].*$")

@@ -1,5 +1,52 @@
 ---
 
+- name: Wait for primary BIG-IQ to be available
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/info/system"
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+  register: system_status
+  until: system_status is success and system_status.json.available|bool
+  retries: 10
+  delay: 30
+
+- name: Wait for secondary BIG-IQ to be available
+  uri:
+    url: "https://{{ secondary_bigiq_address }}:{{ provider.server_port }}/info/system"
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+  register: system_status
+  until: system_status is success and system_status.json.available|bool
+  retries: 10
+  delay: 30
+
+# Requesting a new token since token expireis after 300 seconds
+# Clustering could take time and cause expired token
+- name: Set credentials to use
+  set_fact:
+    bigiq_onboard_credentials_password: "{{ bigiq_onboard_new_admin_password }}"
+  when: >
+    bigiq_onboard_old_admin_password|default(False) and
+    bigiq_onboard_new_admin_password|default(False)
+
+- name: Get new authentication token. Password can be changed after BIGIQ launch.
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/authn/login"
+    method: POST
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    body:
+      username: "{{ bigiq_onboard_user }}"
+      password: "{{ bigiq_onboard_credentials_password }}"
+    body_format: json
+  register: r
+
+- name: Set the token fact if authentication succeeded
+  set_fact:
+    f5_auth_token: "{{ r.json.token.token }}"
+  when: >
+    r is success
+
 - name: Check if ha has been configured
   uri:
     url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/failover-state"

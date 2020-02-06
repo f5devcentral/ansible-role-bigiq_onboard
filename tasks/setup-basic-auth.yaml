@@ -13,7 +13,7 @@
       X-F5-Auth-Token: "{{ f5_auth_token }}"
   register: r
 
-- name: Enable basic auth
+- name: Enable basic auth (BIGIQ < 7.1)
   uri:
     url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/authn/basic-auth"
     method: PUT
@@ -24,4 +24,24 @@
     body:
       isEnabled: true
     body_format: json
-  when: not r.json.isEnabled|bool
+  when: >
+      not r.json.isEnabled|bool and
+      system_status.json.build is undefined or
+      system_status.json.build is not match("^\D+.[7-].[1-].[0-].*$")
+
+
+- name: Enable basic auth (BIGIQ >= 7.1)
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/authn/basic-auth"
+    method: PUT
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
+    body:
+      isEnabled: true
+    body_format: json
+  when: >
+    not r.json.isEnabled|bool and
+    system_status.json.build is defined and
+    system_status.json.build is match("^\D+.[7-].[1-].[0-].*$")
