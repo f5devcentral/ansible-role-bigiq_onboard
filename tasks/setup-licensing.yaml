@@ -94,7 +94,7 @@
       dossier: "{{ status.json.dossier }}"
       eulaText: "{{ status.json.eulaText }}"
     body_format: json
-  when: status.json.build is defined and status.json.build is match("^\D+.[7-].[1-].[0-]$")
+  when: status.json.status == 'NEED_EULA_ACCEPT' and (status.json.build is defined and status.json.build is match("^\D+.[7-].[1-].[0-]$"))
 
 - name: Request license status, with EULA (BIGIQ < 7.1)
   uri:
