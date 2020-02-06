@@ -43,16 +43,26 @@
     f5_auth_token: "{{ authtokenonb.json.token.token }}"
   when: authtokenonb is success
 
-- name: Test authentication
+- name: Test authentication (BIGIQ < 7.1)
   uri:
     url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/echo"
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
     headers:
       X-F5-Auth-Token: "{{ f5_auth_token }}"
-  register: status
+  when: status.json.build is undefined or status.json.build is not match("^\D+.[7-].[1-].[0-]$")
 
-- name: Check if system is setup
+- name: Test authentication (BIGIQ >= 7.1)
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/launch/status"
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
+  when: status.json.build is defined and status.json.build is match("^\D+.[7-].[1-].[0-]$")
+
+
+- name: Check if system is setup (BIGIQ < 7.1)
   uri:
     url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/system/setup"
     timeout: "{{ bigiq_onboard_timeout }}"
@@ -60,6 +70,20 @@
     headers:
       X-F5-Auth-Token: "{{ f5_auth_token }}"
   register: setup
+  when: status.json.build is undefined or status.json.build is not match("^\D+.[7-].[1-].[0-]$")
+
+
+
+- name: Check if system is setup (BIGIQ >= 7.1)
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/config"
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
+  register: setup
+  when: status.json.build is defined and status.json.build is match("^\D+.[7-].[1-].[0-]$")
+
 
 - name: include setup-main.yaml
   include_tasks: setup-main.yaml
