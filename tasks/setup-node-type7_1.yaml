@@ -7,7 +7,7 @@
 
 - name: Provision type on device
   uri:
-    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/cm/system/provisioning"
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/personality"
     method: POST
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"

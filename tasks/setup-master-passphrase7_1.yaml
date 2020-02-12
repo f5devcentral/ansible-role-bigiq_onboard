@@ -2,7 +2,7 @@
 
 - name: Check if master passphrase is set
   uri:
-    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/cm/shared/secure-storage/masterkey"
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/masterkey"
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
     headers:
@@ -16,7 +16,7 @@
 
 - name: Set master passphrase
   uri:
-    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/cm/shared/secure-storage/masterkey"
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/masterkey"
     method: POST
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
@@ -27,5 +27,4 @@
     body_format: json
   register: result
   when: mk.json.isMkSet is not defined or not mk.json.isMkSet|bool
-  notify: Restart device
   changed_when: result.status == 200

@@ -6,13 +6,13 @@
 
 - name: create discovery network VLAN
   uri:
-    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/tm/net/vlan"
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/address/vlan"
     method: POST
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
     headers:
       X-F5-Auth-Token: "{{ f5_auth_token }}"
-    body: "{{ lookup('file','create_discovery_vlan.json') }}"
+    body: "{{ lookup('file','create_discovery_vlan7_1.json') }}"
     body_format: json
 
 - name: sleep for 5 seconds and continue with play
@@ -22,7 +22,7 @@
 
 - name: show discovery network VLAN
   uri:
-    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/tm/net/vlan/~Common~discovery/interfaces"
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/address/interface"
     method: GET
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"

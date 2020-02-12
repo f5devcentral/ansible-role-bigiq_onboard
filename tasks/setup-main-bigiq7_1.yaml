@@ -1,0 +1,51 @@
+---
+
+- include_tasks: setup-licensing-bigiq7_1.yaml
+  when: >
+    system_status.json.isSystemSetup is defined and
+    not system_status.json.isSystemSetup|bool
+
+- include_tasks: setup-node-type7_1.yaml
+  when: >
+    system_status.json.isSystemSetup is defined and
+    not system_status.json.isSystemSetup|bool
+
+- include_tasks: setup-management-address7_1.yaml
+  when: >
+    system_status.json.isSystemSetup is defined and
+    not system_status.json.isSystemSetup|bool
+
+- include_tasks: setup-services7_1.yaml
+  when: >
+    system_status.json.isSystemSetup is defined and
+    not system_status.json.isSystemSetup|bool
+
+- include_tasks: setup-master-passphrase7_1.yaml
+  when: >
+    system_status.json.isSystemSetup is defined and
+    not system_status.json.isSystemSetup|bool
+
+- include_tasks: setup-hostname7_1.yaml
+  when: >
+    system_status.json.isSystemSetup is defined and
+    not system_status.json.isSystemSetup|bool
+
+- include_tasks: setup-passwords7_1.yaml
+  when: >
+    system_status.json.isSystemSetup is defined and
+    not system_status.json.isSystemSetup|bool
+
+- include_tasks: setup-launch-bigiq7_1.yaml
+  when: >
+      system_status.json.isSystemSetup is defined and
+      not system_status.json.isSystemSetup|bool
+
+- include_tasks: setup-basic-auth.yaml
+  when: >
+    system_status.json.isSystemSetup is defined and
+    system_status.json.isSystemSetup|bool
+
+- include_tasks: setup-cm-ha.yaml
+  when:
+    - bigiq_onboard_node_type == 'cm'
+    - secondary_bigiq_address is defined

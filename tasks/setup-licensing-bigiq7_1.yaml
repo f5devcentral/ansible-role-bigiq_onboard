@@ -1,0 +1,80 @@
+---
+
+- name: Verify license is provided
+  fail:
+    msg: "You must provide a license via bigiq_onboard_license_key"
+  when: bigiq_onboard_license_key is not defined
+
+- name: Request to license device (BIGIQ >= 7.1)
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/license/activate"
+    method: POST
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
+    body:
+      baseRegKey: "{{ bigiq_onboard_license_key }}"
+      addOnKeys: []
+    body_format: json
+  register: license_status
+
+- name: Stop if licensing failed
+  fail:
+    msg: Failed to license the device
+  when: license_status.json.status == 'LICENSING_FAILED'
+
+- name: Send EULA if requested (BIGIQ >= 7.1)
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/license/accept-eula"
+    method: POST
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
+    body:
+      baseRegKey: "{{ bigiq_onboard_license_key }}"
+      dossier: "{{ license_status.json.dossier }}"
+      eulaText: "{{ license_status.json.eulaText }}"
+    body_format: json
+  register: license_uela_status
+  when: license_status.json.status == 'NEED_EULA_ACCEPT'
+
+- name: Stop if EULA sending failed
+  fail:
+    msg: Failed to license the device
+  when: license_uela_status.json is defined and license_uela_status.json.status != 'LICENSING_COMPLETE'
+
+- name: Stop if license text was not generated
+  fail:
+    msg: Failed to generate license text
+  when: >
+    (license_status.json is defined and (license_status.json.status not in ['LICENSING_COMPLETE', 'NEED_EULA_ACCEPT'])) or
+    (license_uela_status.json is defined and license_uela_status.json.status != 'LICENSING_COMPLETE')
+
+
+- name: Put license on device (BIGIQ >= 7.1)
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/license"
+    method: POST
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
+    body:
+      licenseText: "{{ license_status.json.licenseText }}"
+    body_format: json
+  when: license_uela_status.json is defined
+
+- name: Put license on device (BIGIQ >= 7.1)
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/license"
+    method: POST
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
+    body:
+      licenseText: "{{ license_status.json.licenseText }}"
+    body_format: json
+  when: license_uela_status.json is undefined and license_status.json is defined

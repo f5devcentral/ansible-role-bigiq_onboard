@@ -2,7 +2,7 @@
 
 - name: Change the system hostname
   uri:
-    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/system/easy-setup"
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/address"
     method: PATCH
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"

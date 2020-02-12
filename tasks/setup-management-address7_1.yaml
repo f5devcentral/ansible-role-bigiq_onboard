@@ -1,8 +1,8 @@
 ---
 
-- name: Get management address details
+- name: Get management address details (BIGIQ >= 7.1)
   uri:
-    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/system/easy-setup"
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/address"
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
     headers:
@@ -10,10 +10,10 @@
   register: ez
   when: bigiq_onboard_discovery_address == provider.server
 
-- name: Set discovery address
+- name: Set discovery address (BIGIQ >= 7.1)
   uri:
-    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/identified-devices/config/discovery"
-    method: PUT
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/address"
+    method: PATCH
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
     headers:
@@ -23,9 +23,9 @@
     body_format: json
   when: bigiq_onboard_discovery_address == provider.server
 
-- name: Check discovery address is correct
+- name: Check discovery address is correct (BIGIQ >= 7.1)
   uri:
-    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/identified-devices/config/discovery"
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/address"
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
     headers:
@@ -38,21 +38,20 @@
 
 ############ from here when Discovery IP is defined
 
-- include_tasks: setup-network.yaml
+- include_tasks: setup-network7_1.yaml
   when: bigiq_onboard_discovery_address != provider.server
 
-- name: Set discovery address to self-ip
+- name: Set discovery address to self-ip (BIGIQ >= 7.1)
   uri:
-    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/shared/system/easy-setup"
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/address/self-ip"
     method: PATCH
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
     headers:
       X-F5-Auth-Token: "{{ f5_auth_token }}"
     body:
-      selfIpAddresses:
-        - address: "{{ bigiq_onboard_discovery_address }}"
-          vlan: discovery
-          iface: "1.1"
+      address: "{{ bigiq_onboard_discovery_address }}"
+      vlan: discovery
+      iface: "1.1"
     body_format: json
   when: bigiq_onboard_discovery_address != provider.server

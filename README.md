@@ -136,6 +136,7 @@ Apache
 
 This role was created in 2018 by [Tim Rupp](https://github.com/caphrim007).<br>
 This role was modified in 2019 by [Greg Crosby](https://github.com/crosbygw).<br>
+This role was modified in 2020 by [Andrey Kashcheev](https://github.com/andreykashcheev).<br>
 
 ## Credits
 

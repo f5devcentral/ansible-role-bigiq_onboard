@@ -1,0 +1,11 @@
+{
+    "name": "discovery",
+    "interfaces": [
+        {
+            "name": "1.1",
+            "untagged": true
+        }
+    ],
+    "tag": 100,
+    "mtu": 1600
+}
