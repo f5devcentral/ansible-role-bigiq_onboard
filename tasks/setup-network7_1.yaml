@@ -30,7 +30,7 @@
       X-F5-Auth-Token: "{{ f5_auth_token }}"
 
 - name: create body variable
-  template: src="{{ role_path }}/templates/create_self_discovery_template.json" dest="{{ role_path }}/templates/{{ ansible_host }}_declared.json"
+  template: src="{{ role_path }}/templates/create_self_discovery_template7_1.json" dest="{{ role_path }}/templates/{{ ansible_host }}_declared.json"
   delegate_to: localhost
 
 - name: show created file content
@@ -39,7 +39,7 @@
 
 - name: create discovery selfIP
   uri:
-    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/tm/net/self"
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/address/self-ip"
     method: POST
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
