@@ -40,18 +40,3 @@
 
 - include_tasks: setup-network7_1.yaml
   when: bigiq_onboard_discovery_address != provider.server
-
-- name: Set discovery address to self-ip (BIGIQ >= 7.1)
-  uri:
-    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/address/self-ip"
-    method: PATCH
-    timeout: "{{ bigiq_onboard_timeout }}"
-    validate_certs: "{{ bigiq_onboard_validate_certs }}"
-    headers:
-      X-F5-Auth-Token: "{{ f5_auth_token }}"
-    body:
-      address: "{{ bigiq_onboard_discovery_address }}"
-      vlan: discovery
-      iface: "1.1"
-    body_format: json
-  when: bigiq_onboard_discovery_address != provider.server
