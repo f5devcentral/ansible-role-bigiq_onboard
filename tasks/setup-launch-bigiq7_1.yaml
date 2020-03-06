@@ -68,7 +68,7 @@
 
 - name: Validate BIGIQ launch state.
   fail:
-    msg: BIGIQ Lauch failed
+    msg: BIGIQ Launch failed
   when: >
     launch_monitor.json is defined and
     launch_monitor.json.status is defined and

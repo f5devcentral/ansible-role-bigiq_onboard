@@ -25,11 +25,6 @@
     system_status.json.isSystemSetup is defined and
     not system_status.json.isSystemSetup|bool
 
-- include_tasks: setup-hostname7_1.yaml
-  when: >
-    system_status.json.isSystemSetup is defined and
-    not system_status.json.isSystemSetup|bool
-
 - include_tasks: setup-passwords7_1.yaml
   when: >
     system_status.json.isSystemSetup is defined and

@@ -8,20 +8,22 @@
     headers:
       X-F5-Auth-Token: "{{ f5_auth_token }}"
   register: ez
-  when: bigiq_onboard_discovery_address == provider.server
 
-- name: Set discovery address (BIGIQ >= 7.1)
+- name: Change the system hostname and set managementIpAddress as discovery address (BIGIQ >= 7.1)
   uri:
     url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/address"
-    method: PATCH
+    method: POST
     timeout: "{{ bigiq_onboard_timeout }}"
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
     headers:
       X-F5-Auth-Token: "{{ f5_auth_token }}"
     body:
+      hostname: "{{ bigiq_onboard_hostname }}"
+      managementIpAddress: "{{ ez.json.managementIpAddress }}"
+      managementRouteAddress: "{{ ez.json.managementRouteAddress }}"
       discoveryAddress: "{{ ez.json.managementIpAddress[:-3] }}"
     body_format: json
-  when: bigiq_onboard_discovery_address == provider.server
+  when: bigiq_onboard_hostname|default('') | length > 0 and bigiq_onboard_discovery_address == provider.server
 
 - name: Check discovery address is correct (BIGIQ >= 7.1)
   uri:
@@ -39,4 +41,33 @@
 ############ from here when Discovery IP is defined
 
 - include_tasks: setup-network7_1.yaml
+  when: bigiq_onboard_discovery_address != provider.server
+
+- name: Change the system hostname and Set managementIpAddress as discovery address (BIGIQ >= 7.1)
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/address"
+    method: POST
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
+    body:
+      hostname: "{{ bigiq_onboard_hostname }}"
+      managementIpAddress: "{{ ez.json.managementIpAddress }}"
+      managementRouteAddress: "{{ ez.json.managementRouteAddress }}"
+      discoveryAddress: "{{ bigiq_onboard_discovery_address[:-3] }}"
+    body_format: json
+  when: bigiq_onboard_hostname|default('') | length > 0 and bigiq_onboard_discovery_address != provider.server
+
+- name: Check discovery address is correct (BIGIQ >= 7.1)
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/address"
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
+  register: result
+  until: bigiq_onboard_discovery_address[:-3] == result.json.discoveryAddress
+  retries: 5
+  delay: 3
   when: bigiq_onboard_discovery_address != provider.server

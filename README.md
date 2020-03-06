@@ -77,7 +77,7 @@ The timezone to set on the BIG-IQ device. This timezone should be specified in t
     bigiq_onboard_license_key:
 
 License key to use to license the BIG-IQ device. If you do not wish to license your
-device, leave this field empty.
+device, leave this field empty. (use "skipLicense:true" to skip license for BIGIQ >= 7.1)
 
     bigiq_onboard_hostname: foo.bar.com
 

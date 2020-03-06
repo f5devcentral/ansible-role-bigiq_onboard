@@ -6,16 +6,6 @@
   with_items: "{{ groups['all'] }}"
   when: not {{ hostvars[item].haprimary | default(True)|bool }}
 
-- name: Wait for BIG-IQ to be available
-  uri:
-    url: "https://{{ provider.server }}:{{ provider.server_port }}/info/system"
-    timeout: "{{ bigiq_onboard_timeout }}"
-    validate_certs: "{{ bigiq_onboard_validate_certs }}"
-  register: system_status
-  until: system_status is success and system_status.json.available|bool
-  retries: 15
-  delay: 15
-
 - name: Setup provider
   set_fact:
     provider:
@@ -25,6 +15,16 @@
       password: "{{ bigiq_onboard_password }}"
       validate_certs: "{{ bigiq_onboard_validate_certs }}"
       transport: "{{ bigiq_onboard_transport }}"
+
+- name: Wait for BIG-IQ to be available
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/info/system"
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+  register: system_status
+  until: system_status is success and system_status.json.available|bool
+  retries: 15
+  delay: 15
 
 - name: Get authentication token
   uri:
