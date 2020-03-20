@@ -5,9 +5,9 @@ driver:
   name: docker
 lint: |
   set -e
-  yamllint -c molecule/default/yaml-lint.yml
-  ansible-lint
-  flake8
+  yamllint . -c molecule/default/yaml-lint.yml
+  ansible-lint .
+  flake8 .
 platforms:
   - name: instance
     image: geerlingguy/docker-${MOLECULE_DISTRO:-centos7}-ansible
