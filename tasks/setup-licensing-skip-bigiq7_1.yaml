@@ -1,0 +1,19 @@
+---
+
+- name: Verify license is provided
+  fail:
+    msg: "You must provide a license via bigiq_onboard_license_key"
+  when: bigiq_onboard_license_key is not defined
+
+- name: Put license on device (BIGIQ >= 7.1)
+  uri:
+    url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/license"
+    method: POST
+    timeout: "{{ bigiq_onboard_timeout }}"
+    validate_certs: "{{ bigiq_onboard_validate_certs }}"
+    headers:
+      X-F5-Auth-Token: "{{ f5_auth_token }}"
+    body:
+      licenseText: "{{ bigiq_onboard_license_key }}"
+    body_format: json
+  when: bigiq_onboard_license_key == 'skipLicense:true'
