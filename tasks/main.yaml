@@ -62,7 +62,10 @@
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
     headers:
       X-F5-Auth-Token: "{{ f5_auth_token }}"
-  when: system_status.json.build is undefined or system_status.json.build is not match("^\D+.[7-].[1-].[0-].*$")
+  when: 
+    - system_status.json.build is defined
+    - system_status.json.build is match("^\D+.[7-].[0-].*$") or
+      system_status.json.build is match("^\D+.[6-].[0-1].*$")
 
 - name: Test authentication (BIGIQ >= 7.1)
   uri:
@@ -71,10 +74,11 @@
     validate_certs: "{{ bigiq_onboard_validate_certs }}"
     headers:
       X-F5-Auth-Token: "{{ f5_auth_token }}"
-  when: >
-    system_status.json.build is defined and
-    system_status.json.build is match("^\D+.[7-].[1-].[0-].*$") and
-    not system_status.json.isSystemSetup|bool
+  when:
+    - system_status.json.build is defined
+    - system_status.json.build is not match("^\D+.[7-].[0-].*$") and
+      system_status.json.build is not match("^\D+.[6-].[0-1].*$")
+    - not system_status.json.isSystemSetup|bool
 
 
 - name: Check if system is setup (BIGIQ < 7.1)
@@ -85,7 +89,10 @@
     headers:
       X-F5-Auth-Token: "{{ f5_auth_token }}"
   register: setup
-  when: system_status.json.build is undefined or system_status.json.build is not match("^\D+.[7-].[1-].[0-].*$")
+  when: 
+    - system_status.json.build is defined
+    - system_status.json.build is match("^\D+.[7-].[0-].*$") or 
+      system_status.json.build is match("^\D+.[6-].[0-1].*$")
 
 - name: Check if system is setup (BIGIQ >= 7.1)
   uri:
@@ -95,19 +102,22 @@
     headers:
       X-F5-Auth-Token: "{{ f5_auth_token }}"
   register: setup
-  when: >
-    system_status.json.build is defined and
-    system_status.json.build is match("^\D+.[7-].[1-].[0-].*$") and
-    not system_status.json.isSystemSetup|bool
+  when:
+    - system_status.json.build is defined
+    - system_status.json.build is not match("^\D+.[7-].[0-].*$") and
+      system_status.json.build is not match("^\D+.[6-].[0-1].*$")
+    - not system_status.json.isSystemSetup|bool
 
 - name: include setup-main.yaml (BIGIQ < 7.1)
   include_tasks: setup-main.yaml
-  when: >
-    system_status.json.build is undefined or
-    system_status.json.build is not match("^\D+.[7-].[1-].[0-].*$")
+  when: 
+    - system_status.json.build is defined
+    - system_status.json.build is match("^\D+.[7-].[0-].*$") or 
+      system_status.json.build is match("^\D+.[6-].[0-1].*$")
 
 - name: include setup-main-bigiq7_1.yaml (BIGIQ >= 7.1)
   include_tasks: setup-main-bigiq7_1.yaml
-  when: >
-    system_status.json.build is defined and
-    system_status.json.build is match("^\D+.[7-].[1-].[0-].*$")
+  when:
+    - system_status.json.build is defined 
+    - system_status.json.build is not match("^\D+.[7-].[0-].*$") and
+      system_status.json.build is not match("^\D+.[6-].[0-1].*$")
