@@ -12,6 +12,11 @@
     body_format: json
   register: r
 
+- name: Set the token fact if authentication succeeded
+  set_fact:
+    f5_auth_token: "{{ r.json.token.token }}"
+  when: r is success
+
 - name: Launch BIGIQ >= 7.1
   uri:
     url: "https://{{ provider.server }}:{{ provider.server_port }}/mgmt/setup/launch"
@@ -22,11 +27,6 @@
       X-F5-Auth-Token: "{{ f5_auth_token }}"
     body_format: json
   register: launch_status
-
-- name: Set the token fact if authentication succeeded
-  set_fact:
-    f5_auth_token: "{{ r.json.token.token }}"
-  when: r is success
 
 - name: Monitor BIGIQ Launch
   uri:
